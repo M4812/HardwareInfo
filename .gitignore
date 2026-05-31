@@ -1,0 +1,29 @@
+# Build outputs
+/build/obj/
+/build/*.exe
+/dist/
+
+# MSVC generated files
+*.obj
+*.pdb
+*.ilk
+*.idb
+*.exp
+*.lib
+
+# Local reports
+report.txt
+report.json
+report.csv
+hardware-info.txt
+hardware-info.json
+
+# Editor and OS files
+.vs/
+.vscode/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+Thumbs.db
+Desktop.ini
