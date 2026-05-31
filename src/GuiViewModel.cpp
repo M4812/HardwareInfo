@@ -118,3 +118,7 @@ std::vector<GuiField> BuildSummaryFields(const SystemReport& report) {
 
     return fields;
 }
+
+std::wstring BuildClientCreditText() {
+    return L"by@muhan";
+}

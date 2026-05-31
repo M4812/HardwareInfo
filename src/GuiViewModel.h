@@ -13,3 +13,4 @@ struct GuiField {
 std::vector<GuiField> BuildSummaryFields(const SystemReport& report);
 std::wstring BuildDiskLine(const DiskInfo& disk);
 std::wstring BuildMemoryLine(const MemoryInfo& memory);
+std::wstring BuildClientCreditText();

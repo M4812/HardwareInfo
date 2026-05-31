@@ -20,12 +20,14 @@ const int IDC_COPY_BASE = 3000;
 
 HINSTANCE g_instance = NULL;
 HFONT g_font = NULL;
+HFONT g_smallFont = NULL;
 SystemReport g_report;
 std::vector<GuiField> g_fields;
 std::vector<HWND> g_valueEdits;
 std::vector<HWND> g_copyButtons;
 HWND g_detailEdit = NULL;
 HWND g_statusText = NULL;
+HWND g_creditText = NULL;
 
 std::wstring ValueOrDash(const std::wstring& value) {
     return Trim(value).empty() ? L"未读取到" : value;
@@ -34,6 +36,12 @@ std::wstring ValueOrDash(const std::wstring& value) {
 void SetWindowFont(HWND hwnd) {
     if (g_font && hwnd) {
         SendMessageW(hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(g_font), TRUE);
+    }
+}
+
+void SetSmallWindowFont(HWND hwnd) {
+    if (g_smallFont && hwnd) {
+        SendMessageW(hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(g_smallFont), TRUE);
     }
 }
 
@@ -220,8 +228,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
         CreateSummaryGrid(hwnd);
         CreateDetailArea(hwnd);
         g_statusText = CreateWindowExW(0, L"STATIC", L"", WS_CHILD | WS_VISIBLE | SS_LEFT,
-            22, 656, 754, 20, hwnd, NULL, g_instance, NULL);
+            22, 656, 650, 20, hwnd, NULL, g_instance, NULL);
         SetWindowFont(g_statusText);
+        g_creditText = CreateWindowExW(0, L"STATIC", BuildClientCreditText().c_str(), WS_CHILD | WS_VISIBLE | SS_RIGHT,
+            690, 658, 86, 18, hwnd, NULL, g_instance, NULL);
+        SetSmallWindowFont(g_creditText);
         CreateButton(hwnd, L"刷新", IDC_REFRESH, 180, 686, 104, 34);
         CreateButton(hwnd, L"导出TXT", IDC_EXPORT_TXT, 308, 686, 104, 34);
         CreateButton(hwnd, L"导出JSON", IDC_EXPORT_JSON, 436, 686, 104, 34);
@@ -255,6 +266,17 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
         break;
     }
 
+    case WM_CTLCOLORSTATIC: {
+        HDC dc = reinterpret_cast<HDC>(wParam);
+        HWND control = reinterpret_cast<HWND>(lParam);
+        if (control == g_creditText) {
+            SetTextColor(dc, RGB(130, 130, 130));
+            SetBkMode(dc, TRANSPARENT);
+            return reinterpret_cast<LRESULT>(GetSysColorBrush(COLOR_BTNFACE));
+        }
+        break;
+    }
+
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
@@ -270,6 +292,11 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int showCommand) {
         OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Microsoft YaHei UI");
     if (!g_font) {
         g_font = static_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT));
+    }
+    g_smallFont = CreateFontW(-11, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Microsoft YaHei UI");
+    if (!g_smallFont) {
+        g_smallFont = g_font;
     }
 
     const wchar_t* className = L"HardwareInfoGuiWindow";
@@ -310,6 +337,9 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int showCommand) {
 
     if (g_font && g_font != GetStockObject(DEFAULT_GUI_FONT)) {
         DeleteObject(g_font);
+    }
+    if (g_smallFont && g_smallFont != g_font && g_smallFont != GetStockObject(DEFAULT_GUI_FONT)) {
+        DeleteObject(g_smallFont);
     }
     return static_cast<int>(message.wParam);
 }

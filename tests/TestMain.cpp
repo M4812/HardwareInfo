@@ -120,6 +120,10 @@ static void TestBuildSummaryFieldsIncludesCoreFields() {
     AssertEqual(fields[0].value, L"Windows Server 2012 R2", "BuildSummaryFields starts with OS value");
 }
 
+static void TestBuildClientCreditText() {
+    AssertEqual(BuildClientCreditText(), L"by@muhan", "BuildClientCreditText returns client credit");
+}
+
 int main() {
     TestTrimRemovesOuterWhitespace();
     TestFormatBytesUsesBinaryUnits();
@@ -132,6 +136,7 @@ int main() {
     TestParseArgsAcceptsNoPause();
     TestBuildDiskLineIncludesModelSizeAndSerial();
     TestBuildSummaryFieldsIncludesCoreFields();
+    TestBuildClientCreditText();
 
     if (failures != 0) {
         std::cerr << failures << " test(s) failed" << std::endl;
